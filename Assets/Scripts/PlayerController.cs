@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
-
+using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 10; // move speed of the player
-    float currentHealth;
     public float maxHealth = 100; // current and max health
     public Transform handAnchor;
     public GameObject defaultGun;
+    public Slider healthBar;
+    private float currentHealth;
     private Gun currentgunInstance;
     Rigidbody rb; // rigid body component of this game object
     private float iFrames = 1;
@@ -19,6 +20,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         //set current health to max health
         currentHealth = maxHealth;
+        healthBar.value = currentHealth / maxHealth;
         // spawn the default gun in the hand anchor position
         currentgunInstance = Instantiate(defaultGun, handAnchor).GetComponent<Gun>();
     }
@@ -37,6 +39,9 @@ public class PlayerController : MonoBehaviour
         {
             canTakeDmg = true;
         }
+
+        // update health bar
+        healthBar.value = Mathf.Lerp(healthBar.value, currentHealth / maxHealth, 2.8f * Time.deltaTime);
     }
 
     public void TakeDamage(float damage)
@@ -56,7 +61,7 @@ public class PlayerController : MonoBehaviour
 
     void Die()
     {
-        Destroy(gameObject);
+        Destroy(gameObject, 0.8f); // destroy player with delay
     }
 
     private void movePlayer()

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-
 public class Gun : MonoBehaviour
 {
     public float fireRate = 5;
@@ -35,7 +34,7 @@ public class Gun : MonoBehaviour
                 else
                 {
                     lr.useWorldSpace = false;
-                    Vector3 pos = new Vector3(0, 0, range);
+                    Vector3 pos = new Vector3(0, 0, range * 1.5f);
                     lr.SetPosition(0, Vector3.zero);
                     lr.SetPosition(1, pos);
                 }

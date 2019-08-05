@@ -29,7 +29,7 @@ public class PlayerController : MonoBehaviour
         movePlayer();
         rotatePlayer();
 
-        if (Input.GetButton("Fire1"))
+        if (Input.GetButton("Fire2"))
         {
             currentgunInstance.Shoot();
         }
@@ -61,51 +61,67 @@ public class PlayerController : MonoBehaviour
 
     private void movePlayer()
     {
-        // construct a "move" vector based on input and use that vector as force for the rigidebody
-        transform.localPosition += new Vector3(Input.GetAxisRaw("Horizontal") * moveSpeed * Time.deltaTime, 0, Input.GetAxisRaw("Vertical") * moveSpeed * Time.deltaTime);
+        // construct a "move" vector based on input and use that vector to translate the player in world space
+        transform.Translate(new Vector3(Input.GetAxisRaw("Horizontal") * moveSpeed * Time.deltaTime, 0, Input.GetAxisRaw("Vertical") * moveSpeed * Time.deltaTime), Space.World);
     }
 
     private void rotatePlayer()
     {
-        // check if the player is facing up
-        if (Input.GetAxisRaw("Horizontal") == 0 && Input.GetAxisRaw("Vertical") > 0)
-        {
-            transform.localEulerAngles = Vector3.zero; // set rotation of player to face up
-        }
-        // check if player is facing down
-        else if (Input.GetAxisRaw("Horizontal") == 0 && Input.GetAxisRaw("Vertical") < 0)
-        {
-            transform.localEulerAngles = new Vector3(0, 180, 0); // set rotation of player to face down
-        }
-        // check if player is facing left
-        else if (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Vertical") == 0)
-        {
-            transform.localEulerAngles = new Vector3(0, 270, 0); // set rotation of player to face left
-        }
-        // check if player is facing right
-        else if (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Vertical") == 0)
-        {
-            transform.localEulerAngles = new Vector3(0, 90, 0); // set rotation of player to face right
-        }
-        // check if player is facing top left
-        else if (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Vertical") > 0)
-        {
-            transform.localEulerAngles = new Vector3(0, 45, 0); // set rotation of player to face top left
-        }
-        // check if player is facing top right
-        else if (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Vertical") > 0)
-        {
-            transform.localEulerAngles = new Vector3(0, 315, 0); // set rotation of player to face top right
-        }
-        // check if player is facing bottom left
-        else if (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Vertical") < 0)
-        {
-            transform.localEulerAngles = new Vector3(0, 225, 0); // set rotation of player to face bottom left
-        }
-        // check if player is facing bottom right
-        else if (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Vertical") < 0)
-        {
-            transform.localEulerAngles = new Vector3(0, 135, 0); // set rotation of player to face bottom right
-        }
+        //// check if the player is facing up
+        //if (Input.GetAxisRaw("Horizontal") == 0 && Input.GetAxisRaw("Vertical") > 0)
+        //{
+        //    transform.localEulerAngles = Vector3.zero; // set rotation of player to face up
+        //}
+        //// check if player is facing down
+        //else if (Input.GetAxisRaw("Horizontal") == 0 && Input.GetAxisRaw("Vertical") < 0)
+        //{
+        //    transform.localEulerAngles = new Vector3(0, 180, 0); // set rotation of player to face down
+        //}
+        //// check if player is facing left
+        //else if (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Vertical") == 0)
+        //{
+        //    transform.localEulerAngles = new Vector3(0, 270, 0); // set rotation of player to face left
+        //}
+        //// check if player is facing right
+        //else if (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Vertical") == 0)
+        //{
+        //    transform.localEulerAngles = new Vector3(0, 90, 0); // set rotation of player to face right
+        //}
+        //// check if player is facing top left
+        //else if (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Vertical") > 0)
+        //{
+        //    transform.localEulerAngles = new Vector3(0, 45, 0); // set rotation of player to face top left
+        //}
+        //// check if player is facing top right
+        //else if (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Vertical") > 0)
+        //{
+        //    transform.localEulerAngles = new Vector3(0, 315, 0); // set rotation of player to face top right
+        //}
+        //// check if player is facing bottom left
+        //else if (Input.GetAxisRaw("Horizontal") < 0 && Input.GetAxisRaw("Vertical") < 0)
+        //{
+        //    transform.localEulerAngles = new Vector3(0, 225, 0); // set rotation of player to face bottom left
+        //}
+        //// check if player is facing bottom right
+        //else if (Input.GetAxisRaw("Horizontal") > 0 && Input.GetAxisRaw("Vertical") < 0)
+        //{
+        //    transform.localEulerAngles = new Vector3(0, 135, 0); // set rotation of player to face bottom right
+        //}
+
+        // player face the mouse
+        //if (Input.GetButton("Fire1"))
+        //{
+            Plane playerPlane = new Plane(Vector3.up, transform.position);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            float hitDist = 0.0f;
+            if (playerPlane.Raycast(ray, out hitDist))
+            {
+                Vector3 targetPoint = ray.GetPoint(hitDist);
+                Quaternion targetRotation = Quaternion.LookRotation(targetPoint - transform.position); // gets a direction and transform it into a quaternion
+                targetRotation.x = targetRotation.z = 0;
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 7.0f * Time.deltaTime);
+            }
+
+        //}
     }
 }
